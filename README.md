@@ -58,3 +58,21 @@ Click on that account that say “App Engine default service account” and then
 Under “add key” click “Create new key”. It with then give you a dialog and you want the “JSON” key type. Select that and press “create”.
 
 Download the JSON file and save it in this directory.
+
+### Adding Firebase Authentication
+
+Go to https://console.firebase.google.com/u/0/
+And under “Your Firebase Projects” click “Add project”.
+
+In the pop up a dialog with the message “Add firebase to one of your existing Google Cloud projects”, select you Cloud Project.
+
+Once selected click “Continue” and select “Continue” again. Disable Google Analytics for the project and click “Add Firebase” and once created click “Continue” again.
+
+On the page that now appears in the menu on the left click “Authentication” then “Get started” In 
+the list of “Sign-in providers” enable “Email/password”.
+In the menu on the left you should see a gear icon just above “Authentication. Click that then click on 
+… In this menu scroll to the bottom and click on the icon that looks like a HTML tag. You will then 
+be brought to a screen titled “Add Firebase to your web app”. Give the app a name and do not check
+the box for firebase hosting. After clicking “Create” you will then click the option “Use a <script> 
+tag” and take a copy of the template you see there. We will use this in the following and future 
+examples.
