@@ -37,7 +37,7 @@ def follow(current_user, target_user):
         'followers': followed_keys
     })
     datastore_client.put(target_user)
-    
+
 
 def unfollow(current_user, target_user):
     following_keys = current_user['following']
@@ -52,8 +52,8 @@ def unfollow(current_user, target_user):
         'followers': followed_keys
     })
     datastore_client.put(target_user)
-    
-    
+
+
 def retrieve_entity(kind, id):
     entity_key = datastore_client.key(kind, id)
     entity = datastore_client.get(entity_key)
@@ -106,12 +106,10 @@ def createCommentInfo(comment, user_info, post_id):
         'comments': comment_dic
     })
     datastore_client.put(post)
-    
+
 def get_multiple_entities(user, list_type, kind):
     ids = user[list_type]
-    keys = []
-    for i in range(len(ids)):
-        keys.append(datastore_client.key(kind, ids[i]))
+    keys = [datastore_client.key(kind, id) for id in ids]
     entities = datastore_client.get_multi(keys)
     return entities
 
@@ -147,7 +145,7 @@ def unfollow_user(tuid):
         except ValueError as exc:
             error_message = str(exc)
     return redirect(url_for('user_profile', id=tuid))
-    
+
 @app.route('/follow/<tuid>')
 def follow_user(tuid):
     id_token = request.cookies.get("token")
@@ -166,7 +164,7 @@ def follow_user(tuid):
         except ValueError as exc:
             error_message = str(exc)
     return redirect(url_for('user_profile', id=tuid))
-    
+
 @app.route('/user/<id>', methods=['GET', 'POST'])
 def user_profile(id):
     id_token = request.cookies.get("token")
