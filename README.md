@@ -23,7 +23,11 @@ This project is developed as a data management application. All the data is stor
 * Type and Run: python main.py
 * Open Browser and go to localhost:8080 or the port your terminal shows.
 
-Before running this, you need to integrate datastore and Google Cloud Project with this app. Read below for guidelines on how to do that.
+Before running this, you need to integrate Firebase Authnetication, Datastore and Google Cloud Project with this app.
+
+This can be along process. To avoid that contact me and I can send you temporary credentials. https://muhammadallain.github.io
+
+Otherwise, Read below for guidelines on how to do that.
 
 ### Create Google Cloud Project
 Go to https://console.cloud.google.com/
