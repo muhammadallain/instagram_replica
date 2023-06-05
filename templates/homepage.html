@@ -1,0 +1,105 @@
+{% extends "root.html" %}
+{% block main %}
+<main>
+    <section>
+        <div id="firebase-auth-container" style="margin-top: 2em;"></div>
+        <button id="sign-out" hidden="true">Sign out</button>
+        <div id="login-info" hidden="true"
+            style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+            {% if user_data %}
+
+            {% if user_info %}
+            <form action="/" method="post" style="padding-bottom: 1em; border-bottom: solid;">
+                <h3>Search Users</h3>
+                <input type="text" name="keyword" placeholder="Search Users" required>
+                <input type="submit" name="submit" value="Search" class="link">
+            </form>
+
+            <form action="/" method="post" enctype="multipart/form-data"
+                style="padding: 1em 0em; border-bottom: solid;">
+                <h3>Create a new post</h3>
+                <input type="file" name="picture" class="link" required /><br>
+                <input type="text" name="caption" placeholder="Type a Caption.." style="width: 270px;" required><br>
+                <div style="display: flex; justify-content: center;">
+                    <input type="submit" name="submit" value="Upload" class="link">
+                </div>
+            </form>
+            {% if users %}
+            <div style="margin-top: 1em; display: flex; flex-direction: column;">
+                <h3 style="margin-bottom: 1em;">Search Results</h3>
+                {% for user in users %}
+                <div style="margin: 1em 0em; display: flex;">
+                    <div>
+                        <dt>Profile Name:</dt>
+                        <dd>{{user['profile_name']}}</dd><br>
+                        <dt>Username:</dt>
+                        <dd>{{user['username']}}</dd>
+                    </div>
+                    <a href="/user/{{user['email']}}" class="link">View Profile</a><br>
+                </div>
+                {% endfor%}
+            </div>
+            {% elif prompt%}
+            <p style="margin: 1em 0em;">{{prompt}}</p>
+            {% endif %}
+            {% if feed and not users %}
+            <div style="margin-top: 1em; width: 500px;">
+                <h2 style="margin-bottom: 1em;">FEED</h2>
+                {% for entity in feed %}
+                <img src="{{entity['image_link']}}" alt="{{entity['caption']}}"
+                    style="display: inline-block; border: solid; max-width: 500px; max-height: 500px;">
+                <div style="text-align: left; margin: 1em 1em;">
+                    <a href="/user/{{entity['posted_by']}}"><strong style="width: 100px;">Posted By:</strong>
+                        {{entity['posted_by']}}</a>
+                    <p><strong style="width: 100px;">Caption:</strong> {{entity['caption']}}</p>
+                    <p style="font-size: x-small; text-align: right;">{{entity['post_time']}}</p>
+                    <hr>
+                    <form action="/" method="post" style="width: 100%;">
+                        <input type="text" name="post_id" value="{{entity['id']}}" hidden>
+                        <input type="text" maxlength="200" name="comment"
+                            placeholder="Type a comment... 200 Characters max" style="width: 77%;" required>
+                        <input type="submit" name="submit" value="Add Comment" class="linkC">
+                    </form>
+                    <hr>
+                    <div>
+                        <h3 style="text-align: center; margin-top: 0.5em;">Comments</h3>
+                        {% for value in entity['comments'][:5] %}
+                        <div class="comments">
+                            <a href="/user/{{value['user_id']}}">{{value['posted_by']}}</a>: <p
+                                style="display: inline-block; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                                {{value['comment']}}</p>
+                        </div>
+                        {% endfor %}
+                        {% for value in entity['comments'][5:] %}
+                        <div class="comments" style="display:none">
+                            <a href="/user/{{value['user_id']}}">{{value['posted_by']}}</a>: <p
+                                style="display: inline-block; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                                {{value['comment']}}</p>
+                        </div>
+                        {% endfor %}
+                        <div style="display: flex; justify-content: right;">
+                            <button id="expand" class="linkC">Expand Comments</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% elif not user_info %}
+            <form action="/generate_new_user" method="post">
+                <h3 style="margin-bottom: 1em;">Create User Profile</h3>
+                <input type="text" name="firstname" placeholder="First Name" required><br>
+                <input type="text" name="lastname" placeholder="Last Name" required><br>
+                <input type="text" name="username" placeholder="Username" required><br>
+                <div style="display: flex; justify-content: center; margin-top: 1em;">
+                    <input type="submit" name="submit" value="Create Profile" class="link">
+                </div>
+            </form>
+            {% endif %}
+            {% elif error_message %}
+            <p>Error Message: {{ error_message }}</p>
+            {% endif %}
+        </div>
+    </section>
+</main>
+{% endblock %}

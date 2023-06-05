@@ -1,0 +1,148 @@
+{% extends "root.html" %}
+{% block main %}
+<main>
+    <section>
+        <div id="firebase-auth-container" style="margin-top: 2em;"></div>
+        <button id="sign-out" hidden="true">Sign out</button>
+        <div id="login-info" hidden="true"
+            style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+            {% if user_data %}
+            <div style="display: flex; width: 500px; justify-content: space-around;">
+                <div style="display: flex; flex-direction: column; align-items: left; ">
+                    <div style="text-align: left;">
+                        <dt>Username:</dt>
+                        <dd>{{profile['username']}}</dd>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 1em;">
+                        <form action="/user/{{profile['email']}}" method="post"
+                            style="display: flex; flex-direction: row; align-items: center;">
+                            <p style="margin-right: 2em;">Followers:</p>
+                            <input type="text" name="list_type" value="followers" hidden>
+                            <input type="submit" name="submit" value="{{follower_count}}" class="link"
+                                style="margin: 0.5em 0em;">
+                        </form>
+                        <form action="/user/{{profile['email']}}" method="post"
+                            style="display: flex; flex-direction: row; align-items: center;">
+                            <p style="margin-right: 2em;">Following:</p>
+                            <input type="text" name="list_type" value="following" hidden>
+                            <input type="submit" name="submit" value="{{following_count}}" class="link"
+                                style="margin: 0.5em 0em;">
+                        </form>
+                    </div>
+                    {% if user_info['email'] != profile['email'] %}
+                    <hr style="margin-bottom: 0.5em;">
+                    <div style="margin: 1em 0em;">
+                        {% if profile['email'] not in user_info['following'] %}
+                        <a href="/follow/{{profile['email']}}" class="link">Follow</a>
+                        {% elif profile['email'] in user_info['following'] %}
+                        <a href="/unfollow/{{profile['email']}}" class="link">Unfollow</a>
+                        {% endif %}
+                    </div>
+                    <hr style="margin-top: 0.5em;">
+                    {% endif %}
+                </div>
+            </div>
+            {% if not list_type %}
+            {% if user_info['email'] == profile['email'] %}
+            <form action="/" method="post" enctype="multipart/form-data"
+                style="margin-top: 1em; padding: 1em 0em; border: solid; width: 500px;">
+                <h3>Create a new post</h3>
+                <input type="file" name="picture" class="link" required /><br>
+                <input type="text" name="caption" placeholder="Type a Caption.." style="width: 270px;" required><br>
+                <div style="display: flex; justify-content: center;">
+                    <input type="submit" name="submit" value="Upload" class="link">
+                </div>
+            </form>
+            {% endif %}
+
+            <div style="margin-top: 1em; width: 500px;">
+                <h2 style="margin-bottom: 1em;">FEED</h2>
+                {% for entity in entities %}
+                <img src="{{entity['image_link']}}" alt="{{entity['caption']}}"
+                    style="display: inline-block; border: solid; max-width: 500px; max-height: 500px;">
+                <div style="text-align: left; margin: 1em 1em;">
+                    <p><strong style="width: 100px;">Posted By:</strong> {{entity['posted_by']}}</p>
+                    <p><strong style="width: 100px;">Caption:</strong> {{entity['caption']}}</p>
+                    <p style="font-size: x-small; text-align: right;">{{entity['post_time']}}</p>
+                    <hr>
+                    <form action="/" method="post" style="width: 100%;">
+                        <input type="text" name="post_id" value="{{entity['id']}}" hidden>
+                        <input type="text" maxlength="200" name="comment"
+                            placeholder="Type a comment... 200 Characters max" style="width: 77%;" required>
+                        <input type="submit" name="submit" value="Add Comment" class="linkC">
+                    </form>
+                    <hr>
+                    <div>
+                        <h3 style="text-align: center; margin-top: 0.5em;">Comments</h3>
+                        {% for value in entity['comments'][:5] %}
+                        <div class="comment">
+                            <a href="/user/{{value['user_id']}}">{{value['posted_by']}}</a>: <p
+                                style="display: inline-block; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                                {{value['comment']}}</p>
+                        </div>
+                        {% endfor %}
+                        {% for value in entity['comments'][5:] %}
+                        <div class="comment" style="display:none">
+                            <a href="/user/{{value['user_id']}}">{{value['posted_by']}}</a>: <p
+                                style="display: inline-block; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                                {{value['comment']}}</p>
+                        </div>
+                        {% endfor %}
+                        <div style="display: flex; justify-content: right;">
+                            <button id="expand-comment" class="linkC">Expand Comments</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% elif list_type == 'followers' %}
+            <div style="margin-top: 1em; display: flex; flex-direction: column;">
+                <h2 style="margin-bottom: 1em;">Followers</h2>
+                {% for entity in entities %}
+                <div style="margin: 1em 0em; display: flex;">
+                    <div>
+                        <dt>Profile Name:</dt>
+                        <dd>{{entity['profile_name']}}</dd><br>
+                        <dt>Username:</dt>
+                        <dd>{{entity['username']}}</dd>
+                    </div>
+                    <a href="/user/{{entity['email']}}" class="link">View Profile</a><br>
+                </div>
+                {% endfor %}
+            </div>
+            {% elif list_type == 'following' %}
+            <div style="margin-top: 1em; display: flex; flex-direction: column;">
+                <h2 style="margin-bottom: 1em;">Following</h2>
+                {% for entity in entities %}
+                <div style="margin: 1em 0em; display: flex;">
+                    <div>
+                        <dt>Profile Name:</dt>
+                        <dd>{{entity['profile_name']}}</dd><br>
+                        <dt>Username:</dt>
+                        <dd>{{entity['username']}}</dd>
+                    </div>
+                    <a href="/user/{{entity['email']}}" class="link">View Profile</a><br>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if prompt %}
+            <p style="margin: 1em 0em;">{{prompt}}</p>
+            {% endif %}
+            {% elif error_message %}
+            <p>Error Message: {{ error_message }}</p>
+            {% endif %}
+        </div>
+    </section>
+</main>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#expand-comment").click(function () {
+            $(".comment:hidden").slideDown();
+            $(this).hide();
+        });
+    });
+</script>
+{% endblock %}
